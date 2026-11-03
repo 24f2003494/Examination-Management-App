@@ -41,13 +41,13 @@ def register():
             flash("An account with this email already exists.", "danger")
             return redirect(url_for("auth.register"))
 
-        new_user = User(
-            full_name=full_name,
-            email=email,
-            password_hash=generate_password_hash(password),
-            role=role,
-            is_approved=(role == "student")
-        )
+        new_user = User()
+
+        new_user.full_name = full_name
+        new_user.email = email
+        new_user.password_hash = generate_password_hash(password)
+        new_user.role = role
+        new_user.is_approved = (role == "student")
 
         db.session.add(new_user)
         db.session.commit()
