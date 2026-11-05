@@ -1,7 +1,10 @@
 
 from extensions import db
+from sqlalchemy.orm import Mapped, relationship
+from typing import TYPE_CHECKING
 
-
+if TYPE_CHECKING:
+    from models.user import User
 class ExaminerProfile(db.Model):
 
     __tablename__ = "examiner_profiles"
@@ -30,10 +33,10 @@ class ExaminerProfile(db.Model):
         nullable=True
     )
 
-    user = db.relationship(
-        "User",
-        back_populates="examiner_profile"
-    )
+    user: Mapped["User"] = relationship(
+    "User",
+    back_populates="examiner_profile"
+)
 
     def __repr__(self):
         return f"<ExaminerProfile {self.user_id}>"

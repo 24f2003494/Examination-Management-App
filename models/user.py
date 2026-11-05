@@ -1,8 +1,16 @@
 
 from flask_login import UserMixin
 from extensions import db
+from typing import Optional, TYPE_CHECKING
 
+from sqlalchemy.orm import Mapped, relationship
+from flask_login import UserMixin
+from extensions import db
 
+if TYPE_CHECKING:
+    from models.examiner import ExaminerProfile
+from sqlalchemy.orm import Mapped, relationship
+from typing import Optional
 class User(UserMixin, db.Model):
 
     __tablename__ = "users"
@@ -36,11 +44,11 @@ class User(UserMixin, db.Model):
         nullable=False
     )
 
-    examiner_profile = db.relationship(
-        "ExaminerProfile",
-        back_populates="user",
-        uselist=False
-    )
+    examiner_profile: Mapped[Optional["ExaminerProfile"]] = relationship(
+    "ExaminerProfile",
+    back_populates="user",
+    uselist=False
+)
 
     examination_slots = db.relationship(
         "ExaminationSlot",

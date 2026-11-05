@@ -1,0 +1,127 @@
+
+{% extends "base.html" %}
+
+{% block title %}Manage Examiners{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Examiner Management</h2>
+
+    <!-- Pending Examiners -->
+    <div class="card shadow mb-4">
+
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">Pending Examiner Approvals</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% if pending_examiners %}
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for examiner in pending_examiners %}
+                                <tr>
+                                    <td>{{ examiner.id }}</td>
+                                    <td>{{ examiner.full_name }}</td>
+                                    <td>{{ examiner.email }}</td>
+                                    <td>
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('examiner_admin.approve_examiner', user_id=examiner.id) }}"
+                                        >
+                                            <button
+                                                type="submit"
+                                                class="btn btn-success btn-sm"
+                                            >
+                                                Approve
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">
+                    No pending examiner approvals.
+                </p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <!-- Approved Examiners -->
+    <div class="card shadow">
+
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Approved Examiners</h5>
+        </div>
+
+        <div class="card-body">
+
+            {% if approved_examiners %}
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for examiner in approved_examiners %}
+                                <tr>
+                                    <td>{{ examiner.id }}</td>
+                                    <td>{{ examiner.full_name }}</td>
+                                    <td>{{ examiner.email }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            Approved
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+            {% else %}
+
+                <p class="text-muted mb-0">
+                    No approved examiners yet.
+                </p>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
