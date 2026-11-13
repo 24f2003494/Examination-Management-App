@@ -36,8 +36,13 @@ from routes.student.booking_routes import student_booking_bp
 from routes.student.result_routes import student_results_bp
 from routes.student.profile_routes import student_profile_bp
 
-
-
+# API routes
+from routes.api.examination_api import examination_api
+from routes.api.examiner_api import examiner_api
+from routes.api.student_api import student_api
+from routes.api.slot_api import slot_api
+from routes.api.booking_api import booking_api
+from routes.api.student_api import student_api
 def create_app():
     app = Flask(__name__)
 
@@ -77,7 +82,12 @@ def create_app():
     app.register_blueprint(student_booking_bp)
     app.register_blueprint(student_results_bp)
     app.register_blueprint(student_profile_bp)
-    
+    # Register API blueprints
+    app.register_blueprint(examination_api)
+    app.register_blueprint(examiner_api)
+    app.register_blueprint(student_api)
+    app.register_blueprint(slot_api)
+    app.register_blueprint(booking_api)
     # Create database tables
     with app.app_context():
         db.create_all()
