@@ -8,3 +8,6 @@ from models.examiner import ExaminerProfile
 from models.slot import ExaminationSlot
 from models.booking import Booking
 from models.evaluation import Evaluation
+from models.timeline import SystemTimeline
+from models.examiner_assignment import ExaminerAssignment
+from models.rubric_evaluation import RubricEvaluation

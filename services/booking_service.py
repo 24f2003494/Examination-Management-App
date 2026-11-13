@@ -1,70 +1,77 @@
 
-from sqlalchemy.exc import IntegrityError
-
 from extensions import db
 from models.booking import Booking
 from models.slot import ExaminationSlot
+from services.timeline_service import is_timeline_open
 
 
-def create_booking(student, slot):
+def get_available_slots(examination_id):
+    return ExaminationSlot.query.filter_by(
+        examination_id=examination_id,
+        status="available"
+    ).order_by(
+        ExaminationSlot.slot_date,
+        ExaminationSlot.start_time
+    ).all()
 
-    # Only students can book examination slots
-    if student.role != "student":
-        return False, "Only students can book examination slots."
 
-    # Check whether the slot is available
+def book_exam_slot(student_id, slot_id):
+    if not is_timeline_open("student_booking"):
+        return False, "Student booking is currently closed."
+
+    slot = db.session.get(ExaminationSlot, slot_id)
+
+    if not slot:
+        return False, "The selected slot does not exist."
+
     if slot.status != "available":
-        return False, "This examination slot is not available."
+        return False, "This slot is not available."
 
-    # Check whether the student already booked
-    # another slot for the same examination
+    if Booking.query.filter_by(
+        student_id=student_id,
+        slot_id=slot_id,
+        status="booked"
+    ).first():
+        return False, "You have already booked this slot."
+
     existing_booking = (
         Booking.query
         .join(ExaminationSlot, Booking.slot_id == ExaminationSlot.id)
         .filter(
-            Booking.student_id == student.id,
-            Booking.status == "booked",
-            ExaminationSlot.examination_id == slot.examination_id
+            Booking.student_id == student_id,
+            ExaminationSlot.examination_id == slot.examination_id,
+            Booking.status == "booked"
         )
         .first()
     )
 
     if existing_booking:
-        return False, "You have already booked this examination."
+        return False, "You have already booked a slot for this examination."
 
-    # Count active bookings for this slot
-    booked_count = Booking.query.filter_by(
-        slot_id=slot.id,
+    active_bookings = Booking.query.filter_by(
+        slot_id=slot_id,
         status="booked"
     ).count()
 
-    if booked_count >= slot.capacity:
+    if active_bookings >= slot.capacity:
         slot.status = "full"
         db.session.commit()
-        return False, "This examination slot is full."
+        return False, "This slot is already full."
 
-    # Create the booking
-    new_booking = Booking()
-
-    new_booking.student_id = student.id
-    new_booking.slot_id = slot.id
-    new_booking.status = "booked"
+    booking = Booking()
+    booking.student_id = student_id
+    booking.slot_id = slot_id
+    booking.status = "booked"
 
     try:
-        db.session.add(new_booking)
+        db.session.add(booking)
 
-        # Update slot status if capacity is reached
-        if booked_count + 1 >= slot.capacity:
+        if active_bookings + 1 >= slot.capacity:
             slot.status = "full"
 
         db.session.commit()
-
-        return True, "Examination slot booked successfully."
-
-    except IntegrityError:
-        db.session.rollback()
-        return False, "This booking already exists."
+        return True, "Slot booked successfully!"
 
     except Exception:
         db.session.rollback()
-        raise
+        return False, "Unable to complete booking. Please try again."

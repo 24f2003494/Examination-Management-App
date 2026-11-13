@@ -6,14 +6,20 @@ class Examination(db.Model):
 
     __tablename__ = "examinations"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     exam_name = db.Column(
         db.String(150),
         nullable=False
     )
 
-    description = db.Column(db.Text, nullable=True)
+    description = db.Column(
+        db.Text,
+        nullable=True
+    )
 
     course_id = db.Column(
         db.Integer,
@@ -40,11 +46,15 @@ class Examination(db.Model):
 
     rubrics = db.relationship(
         "ExaminationRubric",
-        back_populates="examination",
-        cascade="all, delete-orphan"
+        back_populates="examination"
     )
+
     slots = db.relationship(
-    "ExaminationSlot",
+        "ExaminationSlot",
+        back_populates="examination"
+    )
+    examiner_assignments = db.relationship(
+    "ExaminerAssignment",
     back_populates="examination"
 )
     def __repr__(self):

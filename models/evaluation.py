@@ -53,6 +53,10 @@ class Evaluation(db.Model):
         back_populates="evaluations",
         foreign_keys=[examiner_id]
     )
+    rubric_scores = db.relationship(
+    "RubricEvaluation",
+    back_populates="evaluation"
+)
 
     def __repr__(self):
         return f"<Evaluation {self.id}>"

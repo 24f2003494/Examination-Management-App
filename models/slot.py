@@ -1,4 +1,3 @@
-
 from extensions import db
 
 
@@ -6,7 +5,10 @@ class ExaminationSlot(db.Model):
 
     __tablename__ = "examination_slots"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     examination_id = db.Column(
         db.Integer,
@@ -20,11 +22,20 @@ class ExaminationSlot(db.Model):
         nullable=False
     )
 
-    slot_date = db.Column(db.Date, nullable=False)
+    slot_date = db.Column(
+        db.Date,
+        nullable=False
+    )
 
-    start_time = db.Column(db.Time, nullable=False)
+    start_time = db.Column(
+        db.Time,
+        nullable=False
+    )
 
-    end_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(
+        db.Time,
+        nullable=False
+    )
 
     capacity = db.Column(
         db.Integer,
@@ -47,9 +58,11 @@ class ExaminationSlot(db.Model):
         "User",
         back_populates="examination_slots"
     )
+
     bookings = db.relationship(
-    "Booking",
-    back_populates="slot"
-)   
+        "Booking",
+        back_populates="slot"
+    )
+
     def __repr__(self):
         return f"<ExaminationSlot {self.id}>"

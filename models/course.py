@@ -20,12 +20,14 @@ class Course(db.Model):
         nullable=False
     )
 
-    description = db.Column(db.Text, nullable=True)
+    description = db.Column(
+        db.Text,
+        nullable=True
+    )
 
     examinations = db.relationship(
         "Examination",
-        back_populates="course",
-        cascade="all, delete-orphan"
+        back_populates="course"
     )
 
     def __repr__(self):

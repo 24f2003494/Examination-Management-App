@@ -66,6 +66,10 @@ class User(UserMixin, db.Model):
         back_populates="examiner",
         foreign_keys="Evaluation.examiner_id"
     )
-
+    examiner_assignments = db.relationship(
+    "ExaminerAssignment",
+    back_populates="examiner"
+)
+    
     def __repr__(self):
         return f"<User {self.email}>"
