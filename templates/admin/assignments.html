@@ -1,0 +1,73 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}Examiner Assignments{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Examiner Assignments</h2>
+            <p class="text-muted">
+                View and manage examination assignments.
+            </p>
+        </div>
+
+        <a href="{{ url_for('assignment_admin.add_assignment') }}"
+           class="btn btn-primary">
+            Assign Examination
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            {% if assignments %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Examiner</th>
+                            <th>Examination</th>
+                            <th>Course</th>
+                            <th>Assigned On</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for assignment in assignments %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ assignment.examiner.full_name }}</td>
+                            <td>{{ assignment.examination.exam_name }}</td>
+                            <td>{{ assignment.examination.course.course_name }}</td>
+                            <td>
+                                {{ assignment.assigned_at.strftime('%d-%m-%Y') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+            {% else %}
+            <div class="alert alert-info mb-0">
+                No examiner assignments have been created yet.
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>
+{% endblock %}
+```

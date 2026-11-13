@@ -1,0 +1,99 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}Assign Examination{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Assign Examination to Examiner</h4>
+                </div>
+
+                <div class="card-body">
+
+                    <form method="POST">
+
+                        <div class="mb-3">
+                            <label for="examiner_id" class="form-label">
+                                Select Examiner
+                            </label>
+
+                            <select name="examiner_id"
+                                    id="examiner_id"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">Choose an examiner</option>
+
+                                {% for examiner in examiners %}
+                                <option value="{{ examiner.id }}">
+                                    {{ examiner.full_name }} ({{ examiner.email }})
+                                </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="examination_id" class="form-label">
+                                Select Examination
+                            </label>
+
+                            <select name="examination_id"
+                                    id="examination_id"
+                                    class="form-select"
+                                    required>
+
+                                <option value="">Choose an examination</option>
+
+                                {% for exam in examinations %}
+                                <option value="{{ exam.id }}">
+                                    {{ exam.exam_name }} - {{ exam.course.course_name }}
+                                </option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+
+                            <a href="{{ url_for('assignment_admin.assignment_list') }}"
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit" class="btn btn-primary">
+                                Assign Examination
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    {% if not examiners %}
+                    <div class="alert alert-warning mt-3 mb-0">
+                        No approved examiners are available.
+                    </div>
+                    {% endif %}
+
+                    {% if not examinations %}
+                    <div class="alert alert-warning mt-3 mb-0">
+                        No examinations have been created yet.
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+```

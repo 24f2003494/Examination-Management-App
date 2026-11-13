@@ -1,0 +1,136 @@
+
+{% extends "base.html" %}
+
+{% block title %}Manage Examination Results{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2>Examination Results Management</h2>
+
+    <p class="text-muted">
+        Review examiner evaluations and publish results for students.
+    </p>
+
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="btn btn-secondary mb-3">
+        Back to Dashboard
+    </a>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            {% if evaluations %}
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Student</th>
+                            <th>Examination</th>
+                            <th>Examiner</th>
+                            <th>Marks</th>
+                            <th>Remarks</th>
+                            <th>Evaluation Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for evaluation in evaluations %}
+
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <td>
+                                {{ evaluation.booking.student.full_name }}
+                            </td>
+
+                            <td>
+                                {{ evaluation.booking.slot.examination.exam_name }}
+                            </td>
+
+                            <td>
+                                {{ evaluation.examiner.full_name }}
+                            </td>
+
+                            <td>
+                                {{ evaluation.marks_obtained }}
+                                /
+                                {{ evaluation.booking.slot.examination.total_marks }}
+                            </td>
+
+                            <td>
+                                {{ evaluation.remarks or "No remarks" }}
+                            </td>
+
+                            <td>
+                                {{ evaluation.evaluated_at or "—" }}
+                            </td>
+
+                            <td>
+                                {% if evaluation.is_published %}
+                                    <span class="badge bg-success">
+                                        Published
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">
+                                        Pending Publication
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if not evaluation.is_published %}
+
+                                <form method="POST"
+                                      action="{{ url_for(
+                                          'admin_results.publish_result',
+                                          evaluation_id=evaluation.id
+                                      ) }}">
+
+                                    <button type="submit"
+                                            class="btn btn-success btn-sm">
+                                        Publish Result
+                                    </button>
+
+                                </form>
+
+                                {% else %}
+
+                                    <span class="text-success">
+                                        Published
+                                    </span>
+
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="alert alert-info mb-0">
+                No examination evaluations have been submitted yet.
+            </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

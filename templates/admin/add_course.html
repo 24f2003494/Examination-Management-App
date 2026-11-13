@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Add Course{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="mb-4">Add New Course</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form method="POST"
+                  action="{{ url_for('course_admin.add_course') }}">
+
+                <div class="mb-3">
+                    <label for="course_name" class="form-label">
+                        Course Name
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="course_name"
+                        name="course_name"
+                        maxlength="100"
+                        placeholder="e.g. Bachelor of Computer Applications"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="course_code" class="form-label">
+                        Course Code
+                    </label>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="course_code"
+                        name="course_code"
+                        maxlength="20"
+                        placeholder="e.g. BCA"
+                        required
+                    >
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">
+                        Description
+                    </label>
+                    <textarea
+                        class="form-control"
+                        id="description"
+                        name="description"
+                        rows="4"
+                        placeholder="Enter a short course description"
+                    ></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Course
+                </button>
+
+                <a href="{{ url_for('course_admin.course_list') }}"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

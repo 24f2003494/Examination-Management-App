@@ -1,0 +1,128 @@
+
+{% extends "base.html" %}
+
+{% block title %}Manage Examinations{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Manage Examinations</h2>
+            <p class="text-muted">
+                Create and manage examinations and their rubrics.
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('exam_admin.add_exam') }}"
+            class="btn btn-primary"
+        >
+            Add Examination
+        </a>
+
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            {% if examinations %}
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Examination Name</th>
+                            <th>Course</th>
+                            <th>Total Marks</th>
+                            <th>Passing Marks</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for exam in examinations %}
+
+                        <tr>
+
+                            <td>{{ loop.index }}</td>
+
+                            <td>{{ exam.exam_name }}</td>
+
+                            <td>{{ exam.course.course_name }}</td>
+
+                            <td>{{ exam.total_marks }}</td>
+
+                            <td>{{ exam.passing_marks }}</td>
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for('exam_admin.edit_exam', exam_id=exam.id) }}"
+                                    class="btn btn-sm btn-warning mb-1"
+                                >
+                                    Edit
+                                </a>
+
+                                <a
+                                    href="{{ url_for('rubric_admin.rubric_list', exam_id=exam.id) }}"
+                                    class="btn btn-sm btn-info mb-1"
+                                >
+                                    Manage Rubrics
+                                </a>
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for('exam_admin.delete_exam', exam_id=exam.id) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm('Are you sure you want to delete this examination?');"
+                                >
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-danger mb-1"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+            <div class="alert alert-info mb-0">
+                No examinations have been created yet.
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <a
+        href="{{ url_for('admin.dashboard') }}"
+        class="btn btn-secondary mt-3"
+    >
+        Back to Dashboard
+    </a>
+
+</div>
+
+{% endblock %}

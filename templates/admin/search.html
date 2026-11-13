@@ -1,0 +1,130 @@
+
+{% extends "base.html" %}
+
+{% block title %}Admin Search{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2>Search Portal Records</h2>
+
+    <form method="GET" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control"
+                   value="{{ search }}"
+                   placeholder="Search by name, email or ID..."
+                   required>
+            <button type="submit" class="btn btn-primary">
+                Search
+            </button>
+        </div>
+    </form>
+
+    {% if search %}
+
+    <h4>Students</h4>
+    {% if students %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th></tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td>{{ student.full_name }}</td>
+                <td>{{ student.email }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No students found.</p>
+    {% endif %}
+
+    <hr>
+
+    <h4>Examiners</h4>
+    {% if examiners %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Approval</th></tr>
+        </thead>
+        <tbody>
+            {% for examiner in examiners %}
+            <tr>
+                <td>{{ examiner.id }}</td>
+                <td>{{ examiner.full_name }}</td>
+                <td>{{ examiner.email }}</td>
+                <td>{{ "Approved" if examiner.is_approved else "Pending" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No examiners found.</p>
+    {% endif %}
+
+    <hr>
+
+    <h4>Examinations</h4>
+    {% if examinations %}
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr><th>ID</th><th>Examination</th><th>Course</th></tr>
+        </thead>
+        <tbody>
+            {% for exam in examinations %}
+            <tr>
+                <td>{{ exam.id }}</td>
+                <td>{{ exam.exam_name }}</td>
+                <td>{{ exam.course.course_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No examinations found.</p>
+    {% endif %}
+
+    <hr>
+
+    <h4>Bookings</h4>
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Student</th>
+                    <th>Examination</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.id }}</td>
+                    <td>{{ booking.student.full_name }}</td>
+                    <td>{{ booking.slot.examination.exam_name }}</td>
+                    <td>{{ booking.slot.slot_date.strftime('%d-%m-%Y') }}</td>
+                    <td>{{ booking.status|capitalize }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No bookings found.</p>
+    {% endif %}
+
+    {% endif %}
+
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>
+{% endblock %}

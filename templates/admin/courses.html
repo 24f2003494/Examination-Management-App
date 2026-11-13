@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Courses{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Manage Courses</h2>
+
+        <a href="{{ url_for('course_admin.add_course') }}"
+           class="btn btn-primary">
+            Add New Course
+        </a>
+    </div>
+
+    {% if courses %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Course Code</th>
+                    <th>Course Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>{{ course.course_code }}</td>
+                    <td>{{ course.course_name }}</td>
+                    <td>{{ course.description or "—" }}</td>
+                    <td>
+                        <a href="{{ url_for(
+                            'course_admin.edit_course',
+                            course_id=course.id
+                        ) }}" class="btn btn-sm btn-warning">
+                            Edit
+                        </a>
+
+                        <form method="POST"
+                              action="{{ url_for(
+                                  'course_admin.delete_course',
+                                  course_id=course.id
+                              ) }}"
+                              class="d-inline"
+                              onsubmit="return confirm('Are you sure you want to delete this course?');">
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% else %}
+        <div class="alert alert-info">
+            No courses have been added yet.
+        </div>
+    {% endif %}
+
+    <a href="{{ url_for('admin.dashboard') }}"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>
+{% endblock %}
