@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}My Examination Slots{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>My Examination Slots</h2>
+            <p class="text-muted">
+                View and manage your examination slots.
+            </p>
+        </div>
+
+        <a href="{{ url_for('examiner_slots.add_slot') }}"
+           class="btn btn-primary">
+            Create New Slot
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            {% if slots %}
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Examination</th>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for slot in slots %}
+
+                        <tr>
+                            <td>{{ loop.index }}</td>
+
+                            <td>
+                                {{ slot.examination.exam_name }}
+                            </td>
+
+                            <td>
+                                {{ slot.slot_date.strftime('%d-%m-%Y') }}
+                            </td>
+
+                            <td>
+                                {{ slot.start_time.strftime('%I:%M %p') }}
+                            </td>
+
+                            <td>
+                                {{ slot.end_time.strftime('%I:%M %p') }}
+                            </td>
+
+                            <td>
+                                {{ slot.capacity }}
+                            </td>
+
+                            <td>
+                                {% if slot.status == 'available' %}
+                                    <span class="badge bg-success">
+                                        Available
+                                    </span>
+
+                                {% elif slot.status == 'full' %}
+                                    <span class="badge bg-danger">
+                                        Full
+                                    </span>
+
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        {{ slot.status|title }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if slot.bookings %}
+
+                                    <span class="text-muted">
+                                        Locked (has bookings)
+                                    </span>
+
+                                {% else %}
+
+                                    <a href="{{ url_for(
+                                        'examiner_slots.edit_slot',
+                                        slot_id=slot.id
+                                    ) }}"
+                                       class="btn btn-sm btn-warning mb-1">
+                                        Edit
+                                    </a>
+
+                                    <form method="POST"
+                                          action="{{ url_for(
+                                              'examiner_slots.delete_slot',
+                                              slot_id=slot.id
+                                          ) }}"
+                                          class="d-inline">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-danger mb-1">
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+            {% else %}
+
+                <div class="alert alert-info mb-0">
+                    You haven't created any examination slots yet.
+                </div>
+
+            {% endif %}
+
+        </div>
+    </div>
+
+    <a href="{{ url_for('examiner.dashboard') }}"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>
+{% endblock %}

@@ -3,9 +3,27 @@
 {% block title %}Examiner Dashboard{% endblock %}
 
 {% block content %}
+
 <div class="container mt-4">
+
     <h2>Examiner Dashboard</h2>
-    <p>Welcome, {{ current_user.full_name }}!</p>
-    <p>You are logged in as an Examiner.</p>
+
+    <p>Welcome to your examiner dashboard.</p>
+
+    <a href="{{ url_for('examiner_slots.slot_list') }}"
+       class="btn btn-primary">
+        Manage My Slots
+    </a>
+
+   <a href="{{ url_for('examiner_participants.participant_list') }}"
+   class="btn btn-primary">
+    View My Students
+</a>
+<a href="{{ url_for('examiner_evaluations.evaluation_list') }}"
+   class="btn btn-primary">
+    Pending Evaluations
+</a>
+
 </div>
+
 {% endblock %}
