@@ -1,0 +1,129 @@
+
+{% extends "base.html" %}
+
+{% block title %}Browse Examinations{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-2">Browse Examinations</h2>
+    <p class="text-muted">Explore examinations and book your examination slot.</p>
+
+    <!-- Search and Filter -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <form method="GET"
+                  action="{{ url_for('student_exams.exam_list') }}">
+
+                <div class="row g-2">
+
+                    <div class="col-md-6">
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Search examination..."
+                               value="{{ request.args.get('search', '') }}">
+                    </div>
+
+                    <div class="col-md-4">
+                        <select name="course_id" class="form-select">
+                            <option value="">All Courses</option>
+
+                            {% for course in courses %}
+                                <option value="{{ course.id }}"
+                                    {% if request.args.get('course_id') == course.id|string %}
+                                        selected
+                                    {% endif %}>
+                                    {{ course.course_name }}
+                                </option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Examination List -->
+    <div class="row g-3">
+
+        {% if examinations %}
+
+            {% for exam in examinations %}
+
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card shadow-sm h-100">
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                {{ exam.exam_name }}
+                            </h5>
+
+                            <p class="text-muted">
+                                {{ exam.description or "No description available." }}
+                            </p>
+
+                            <p>
+                                <strong>Course:</strong>
+                                {{ exam.course.course_name if exam.course else "N/A" }}
+                            </p>
+
+                            <p>
+                                <strong>Total Marks:</strong>
+                                {{ exam.total_marks }}
+                            </p>
+
+                            <p>
+                                <strong>Passing Marks:</strong>
+                                {{ exam.passing_marks }}
+                            </p>
+
+                            <a href="{{ url_for('student_bookings.slot_list', examination_id=exam.id) }}"
+                               class="btn btn-primary btn-sm">
+                                View Available Slots
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="col-12">
+                <div class="alert alert-info">
+                    No examinations found. Try changing your search or filter.
+                </div>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('student.dashboard') }}"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Examination Schedule{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Examination Schedule</h2>
+
+    <a href="{{ url_for('student.dashboard') }}"
+       class="btn btn-secondary mb-3">Back to Dashboard</a>
+
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Examination</th>
+                    <th>Date</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Examiner</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.slot.examination.exam_name }}</td>
+                    <td>{{ booking.slot.slot_date }}</td>
+                    <td>{{ booking.slot.start_time }}</td>
+                    <td>{{ booking.slot.end_time }}</td>
+                    <td>{{ booking.slot.examiner.full_name }}</td>
+                    <td>
+                        <span class="badge bg-success">{{ booking.status }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        You have no upcoming examinations scheduled.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

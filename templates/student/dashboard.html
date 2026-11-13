@@ -1,11 +1,143 @@
+
 {% extends "base.html" %}
 
 {% block title %}Student Dashboard{% endblock %}
 
 {% block content %}
+
 <div class="container mt-4">
-    <h2>Student Dashboard</h2>
-    <p>Welcome, {{ current_user.full_name }}!</p>
-    <p>You are logged in as a Student.</p>
+
+    <div class="mb-4">
+        <h2>Student Dashboard</h2>
+        <p class="text-muted">
+            Welcome, {{ current_user.full_name }}! Manage your examinations and bookings here.
+        </p>
+    </div>
+
+    <!-- Dashboard Statistics -->
+    <h4 class="mb-3">My Examination Overview</h4>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h5>Total Examinations</h5>
+                    <h2>{{ counts.examinations }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h5>Available Slots</h5>
+                    <h2>{{ counts.available_slots }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h5>Upcoming Examinations</h5>
+                    <h2>{{ counts.upcoming_examinations }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h5>My Bookings</h5>
+                    <h2>{{ counts.bookings }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h5>Published Results</h5>
+                    <h2>{{ counts.published_results }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Student Activities -->
+    <h4 class="mt-5 mb-3">Student Activities</h4>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Browse Examinations</h5>
+                    <p>Explore available examinations and their details.</p>
+                    <a href="{{ url_for('student_exams.exam_list') }}"
+                       class="btn btn-primary btn-sm">
+                        Browse Examinations
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>My Bookings</h5>
+                    <p>View and manage your examination bookings.</p>
+                    <a href="{{ url_for('student_bookings.booking_list') }}"
+                       class="btn btn-primary btn-sm">
+                        View Bookings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Examination Schedule</h5>
+                    <p>Check your upcoming examination schedule.</p>
+                    <a href="{{ url_for('student_bookings.schedule') }}"
+                       class="btn btn-primary btn-sm">
+                        View Schedule
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>My Results</h5>
+                    <p>View published marks and examiner feedback.</p>
+                    <a href="{{ url_for('student_results.result_list') }}"
+                       class="btn btn-primary btn-sm">
+                        View Results
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>My Profile</h5>
+                    <p>Update your personal information and password.</p>
+                    <a href="{{ url_for('student_profile.edit_profile') }}"
+                       class="btn btn-primary btn-sm">
+                        Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
 {% endblock %}

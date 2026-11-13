@@ -1,0 +1,141 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Results{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>My Examination Results</h2>
+
+        <a href="{{ url_for('student.dashboard') }}"
+           class="btn btn-secondary">
+            Back to Dashboard
+        </a>
+    </div>
+
+    {% if evaluations %}
+
+        {% for evaluation in evaluations %}
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    {{ evaluation.booking.slot.examination.exam_name }}
+                </h5>
+                <small>Published Examination Result</small>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row mb-3">
+
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Course:</strong>
+                            {{ evaluation.booking.slot.examination.course.course_name }}
+                        </p>
+
+                        <p>
+                            <strong>Examiner:</strong>
+                            {{ evaluation.examiner.full_name }}
+                        </p>
+                    </div>
+
+                    <div class="col-md-6">
+                        <p>
+                            <strong>Marks Obtained:</strong>
+                            {{ evaluation.marks_obtained }}
+                            /
+                            {{ evaluation.booking.slot.examination.total_marks }}
+                        </p>
+
+                        <p>
+                            <strong>Evaluation Date:</strong>
+                            {{ evaluation.evaluated_at or "Not available" }}
+                        </p>
+                    </div>
+
+                </div>
+
+                <hr>
+
+                <h5>Examiner Feedback</h5>
+
+                <div class="alert alert-light border">
+                    {{ evaluation.remarks or "No additional feedback provided." }}
+                </div>
+
+                <h5 class="mt-4">Rubric-wise Marks Breakdown</h5>
+
+                {% if evaluation.rubric_scores %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Evaluation Criterion</th>
+                                <th>Marks Awarded</th>
+                                <th>Maximum Marks</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            {% for score in evaluation.rubric_scores %}
+
+                            <tr>
+                                <td>{{ loop.index }}</td>
+
+                                <td>
+                                    {{ score.rubric.rubric_name }}
+                                </td>
+
+                                <td>
+                                    {{ score.marks_awarded }}
+                                </td>
+
+                                <td>
+                                    {{ score.rubric.max_marks }}
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="alert alert-info">
+                    No rubric breakdown available.
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert alert-info">
+            No results have been published for you yet.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
