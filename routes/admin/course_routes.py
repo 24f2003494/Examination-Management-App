@@ -1,3 +1,4 @@
+import re
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 
@@ -13,11 +14,28 @@ course_admin_bp = Blueprint(
 )
 
 
-# View all courses
+def validate_course(course_name, course_code, description):
+    if not course_name or not course_code:
+        return "Course name and course code are required."
+
+    if len(course_name) < 2 or len(course_name) > 100:
+        return "Course name must be between 2 and 100 characters."
+
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]{1,19}", course_code):
+        return (
+            "Course code must be 2–20 characters and contain only "
+            "letters, numbers, hyphens or underscores."
+        )
+
+    if len(description) > 1000:
+        return "Course description cannot exceed 1000 characters."
+
+    return None
+
+
 @course_admin_bp.route("/")
 @role_required("admin")
 def course_list():
-
     courses = Course.query.order_by(Course.course_name).all()
 
     return render_template(
@@ -26,23 +44,22 @@ def course_list():
     )
 
 
-# Add a new course
 @course_admin_bp.route("/add", methods=["GET", "POST"])
 @role_required("admin")
 def add_course():
-
     if request.method == "POST":
-
         course_name = request.form.get("course_name", "").strip()
         course_code = request.form.get("course_code", "").strip().upper()
         description = request.form.get("description", "").strip()
 
-        if not course_name or not course_code:
-            flash("Course name and course code are required.", "danger")
+        error = validate_course(course_name, course_code, description)
+
+        if error:
+            flash(error, "danger")
             return redirect(url_for("course_admin.add_course"))
 
         existing_course = Course.query.filter(
-            (Course.course_name == course_name) |
+            (Course.course_name.ilike(course_name)) |
             (Course.course_code == course_code)
         ).first()
 
@@ -69,28 +86,29 @@ def add_course():
     return render_template("admin/add_course.html")
 
 
-# Edit an existing course
 @course_admin_bp.route("/edit/<int:course_id>", methods=["GET", "POST"])
 @role_required("admin")
 def edit_course(course_id):
-
     course = db.get_or_404(Course, course_id)
 
     if request.method == "POST":
-
         course_name = request.form.get("course_name", "").strip()
         course_code = request.form.get("course_code", "").strip().upper()
         description = request.form.get("description", "").strip()
 
-        if not course_name or not course_code:
-            flash("Course name and course code are required.", "danger")
+        error = validate_course(course_name, course_code, description)
+
+        if error:
+            flash(error, "danger")
             return redirect(
                 url_for("course_admin.edit_course", course_id=course.id)
             )
 
         duplicate_course = Course.query.filter(
-            ((Course.course_name == course_name) |
-             (Course.course_code == course_code)) &
+            (
+                Course.course_name.ilike(course_name) |
+                (Course.course_code == course_code)
+            ) &
             (Course.id != course.id)
         ).first()
 
@@ -119,11 +137,9 @@ def edit_course(course_id):
     )
 
 
-# Delete a course only if it has no examinations
 @course_admin_bp.route("/delete/<int:course_id>", methods=["POST"])
 @role_required("admin")
 def delete_course(course_id):
-
     course = db.get_or_404(Course, course_id)
 
     if course.examinations:
@@ -136,7 +152,6 @@ def delete_course(course_id):
     try:
         db.session.delete(course)
         db.session.commit()
-
         flash("Course deleted successfully!", "success")
 
     except Exception:

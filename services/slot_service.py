@@ -1,5 +1,5 @@
 
-from datetime import date
+from datetime import date, datetime
 
 from extensions import db
 from models.examination import Examination
@@ -23,7 +23,8 @@ def create_examiner_slot(
     examiner = User.query.filter_by(
         id=examiner_id,
         role="examiner",
-        is_approved=True
+        is_approved=True,
+        account_active=True
     ).first()
 
     if not examiner:
@@ -45,13 +46,16 @@ def create_examiner_slot(
     if slot_date < date.today():
         return False, "You cannot create a slot in the past."
 
+    if slot_date == date.today() and start_time <= datetime.now().time():
+        return False, "The slot start time must be in the future."
+
     if end_time <= start_time:
         return False, "End time must be later than start time."
 
     if capacity <= 0:
         return False, "Slot capacity must be greater than zero."
 
-    # Prevent overlapping slots for the same examiner.
+                                                      
     overlapping_slot = ExaminationSlot.query.filter(
         ExaminationSlot.examiner_id == examiner_id,
         ExaminationSlot.slot_date == slot_date,

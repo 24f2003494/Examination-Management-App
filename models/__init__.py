@@ -1,6 +1,4 @@
 from models.user import User
-
-from models.user import User
 from models.course import Course
 from models.examination import Examination
 from models.rubric import ExaminationRubric

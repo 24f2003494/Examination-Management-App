@@ -11,8 +11,9 @@ from flask import (
 from extensions import db
 from models.examination import Examination
 from models.course import Course
-from utils.decorators import role_required
 from models.slot import ExaminationSlot
+from utils.decorators import role_required
+
 
 exam_admin_bp = Blueprint(
     "exam_admin",
@@ -21,7 +22,47 @@ exam_admin_bp = Blueprint(
 )
 
 
-# View all examinations
+                              
+EXAMINATION_STATUSES = {
+    "Draft", "Slot Creation", "Booking Open", "Closed", "Completed"
+}
+
+
+def validate_exam(exam_name, description, course_id, total_marks, passing_marks, status):
+
+    if not exam_name or not course_id or not total_marks or not passing_marks:
+        return "Please fill in all required fields."
+
+    if len(exam_name) < 2 or len(exam_name) > 150:
+        return "Examination name must be between 2 and 150 characters."
+
+    if len(description) > 2000:
+        return "Examination description cannot exceed 2000 characters."
+
+    if status not in EXAMINATION_STATUSES:
+        return "Please select a valid examination status."
+
+    try:
+        course_id = int(course_id)
+        total_marks = int(total_marks)
+        passing_marks = int(passing_marks)
+
+    except ValueError:
+        return "Please enter valid numeric values."
+
+    if not db.session.get(Course, course_id):
+        return "Please select a valid course."
+
+    if total_marks <= 0 or total_marks > 100000:
+        return "Total marks must be between 1 and 100000."
+
+    if passing_marks < 0 or passing_marks > total_marks:
+        return "Passing marks must be between zero and total marks."
+
+    return None
+
+
+                       
 @exam_admin_bp.route("/")
 @role_required("admin")
 def exam_list():
@@ -36,70 +77,41 @@ def exam_list():
     )
 
 
-# Add a new examination
+                       
 @exam_admin_bp.route("/add", methods=["GET", "POST"])
 @role_required("admin")
 def add_exam():
 
     if request.method == "POST":
 
-        exam_name = request.form.get(
-            "exam_name", ""
-        ).strip()
+        exam_name = request.form.get("exam_name", "").strip()
+        description = request.form.get("description", "").strip()
+        course_id = request.form.get("course_id", "").strip()
+        total_marks = request.form.get("total_marks", "").strip()
+        passing_marks = request.form.get("passing_marks", "").strip()
+        status = request.form.get("status", "Draft").strip()
 
-        description = request.form.get(
-            "description", ""
-        ).strip()
+        error = validate_exam(
+            exam_name,
+            description,
+            course_id,
+            total_marks,
+            passing_marks,
+            status
+        )
 
-        course_id = request.form.get(
-            "course_id", ""
-        ).strip()
-
-        total_marks = request.form.get(
-            "total_marks", ""
-        ).strip()
-
-        passing_marks = request.form.get(
-            "passing_marks", ""
-        ).strip()
-
-        if not exam_name or not course_id or not total_marks or not passing_marks:
-            flash("Please fill in all required fields.", "danger")
+        if error:
+            flash(error, "danger")
             return redirect(url_for("exam_admin.add_exam"))
 
-        try:
-            course_id = int(course_id)
-            total_marks = int(total_marks)
-            passing_marks = int(passing_marks)
-
-        except ValueError:
-            flash("Please enter valid numeric values.", "danger")
-            return redirect(url_for("exam_admin.add_exam"))
-
-        course = db.session.get(Course, course_id)
-
-        if not course:
-            flash("Please select a valid course.", "danger")
-            return redirect(url_for("exam_admin.add_exam"))
-
-        if total_marks <= 0:
-            flash("Total marks must be greater than zero.", "danger")
-            return redirect(url_for("exam_admin.add_exam"))
-
-        if passing_marks < 0 or passing_marks > total_marks:
-            flash(
-                "Passing marks must be between zero and total marks.",
-                "danger"
-            )
-            return redirect(url_for("exam_admin.add_exam"))
-
+                                                  
         examination = Examination()
-
         examination.exam_name = exam_name
         examination.description = description or None
-        examination.course_id = course_id
-        examination.total_marks = total_marks
-        examination.passing_marks = passing_marks
+        examination.course_id = int(course_id)
+        examination.total_marks = int(total_marks)
+        examination.passing_marks = int(passing_marks)
+        examination.status = status
 
         try:
             db.session.add(examination)
@@ -109,11 +121,13 @@ def add_exam():
 
             return redirect(url_for("exam_admin.exam_list"))
 
-        except Exception:
+        except Exception as e:
             db.session.rollback()
 
+            print("EXAMINATION CREATION ERROR:", repr(e))
+
             flash(
-                "Unable to create examination. Please try again.",
+                "Unable to create examination. Please check the terminal.",
                 "danger"
             )
 
@@ -127,11 +141,8 @@ def add_exam():
     )
 
 
-# Edit an existing examination
-@exam_admin_bp.route(
-    "/edit/<int:exam_id>",
-    methods=["GET", "POST"]
-)
+                              
+@exam_admin_bp.route("/edit/<int:exam_id>", methods=["GET", "POST"])
 @role_required("admin")
 def edit_exam(exam_id):
 
@@ -142,78 +153,24 @@ def edit_exam(exam_id):
 
     if request.method == "POST":
 
-        exam_name = request.form.get(
-            "exam_name", ""
-        ).strip()
+        exam_name = request.form.get("exam_name", "").strip()
+        description = request.form.get("description", "").strip()
+        course_id = request.form.get("course_id", "").strip()
+        total_marks = request.form.get("total_marks", "").strip()
+        passing_marks = request.form.get("passing_marks", "").strip()
+        status = request.form.get("status", "Draft").strip()
 
-        description = request.form.get(
-            "description", ""
-        ).strip()
+        error = validate_exam(
+            exam_name,
+            description,
+            course_id,
+            total_marks,
+            passing_marks,
+            status
+        )
 
-        course_id = request.form.get(
-            "course_id", ""
-        ).strip()
-
-        total_marks = request.form.get(
-            "total_marks", ""
-        ).strip()
-
-        passing_marks = request.form.get(
-            "passing_marks", ""
-        ).strip()
-
-        if not exam_name or not course_id or not total_marks or not passing_marks:
-            flash("Please fill in all required fields.", "danger")
-
-            return redirect(
-                url_for(
-                    "exam_admin.edit_exam",
-                    exam_id=exam_id
-                )
-            )
-
-        try:
-            course_id = int(course_id)
-            total_marks = int(total_marks)
-            passing_marks = int(passing_marks)
-
-        except ValueError:
-            flash("Please enter valid numeric values.", "danger")
-
-            return redirect(
-                url_for(
-                    "exam_admin.edit_exam",
-                    exam_id=exam_id
-                )
-            )
-
-        course = db.session.get(Course, course_id)
-
-        if not course:
-            flash("Please select a valid course.", "danger")
-
-            return redirect(
-                url_for(
-                    "exam_admin.edit_exam",
-                    exam_id=exam_id
-                )
-            )
-
-        if total_marks <= 0:
-            flash("Total marks must be greater than zero.", "danger")
-
-            return redirect(
-                url_for(
-                    "exam_admin.edit_exam",
-                    exam_id=exam_id
-                )
-            )
-
-        if passing_marks < 0 or passing_marks > total_marks:
-            flash(
-                "Passing marks must be between zero and total marks.",
-                "danger"
-            )
+        if error:
+            flash(error, "danger")
 
             return redirect(
                 url_for(
@@ -224,9 +181,10 @@ def edit_exam(exam_id):
 
         examination.exam_name = exam_name
         examination.description = description or None
-        examination.course_id = course_id
-        examination.total_marks = total_marks
-        examination.passing_marks = passing_marks
+        examination.course_id = int(course_id)
+        examination.total_marks = int(total_marks)
+        examination.passing_marks = int(passing_marks)
+        examination.status = status
 
         try:
             db.session.commit()
@@ -235,11 +193,13 @@ def edit_exam(exam_id):
 
             return redirect(url_for("exam_admin.exam_list"))
 
-        except Exception:
+        except Exception as e:
             db.session.rollback()
 
+            print("EXAMINATION UPDATE ERROR:", repr(e))
+
             flash(
-                "Unable to update examination. Please try again.",
+                "Unable to update examination. Please check the terminal.",
                 "danger"
             )
 
@@ -252,7 +212,9 @@ def edit_exam(exam_id):
         examination=examination,
         courses=courses
     )
-    # Delete an examination safely
+
+
+                              
 @exam_admin_bp.route(
     "/delete/<int:exam_id>",
     methods=["POST"]
@@ -265,7 +227,7 @@ def delete_exam(exam_id):
         exam_id
     )
 
-    # Preserve examination history if slots exist
+                                                 
     existing_slot = ExaminationSlot.query.filter_by(
         examination_id=exam_id
     ).first()
@@ -276,29 +238,31 @@ def delete_exam(exam_id):
             "It cannot be deleted because historical records must be preserved.",
             "warning"
         )
+
         return redirect(url_for("exam_admin.exam_list"))
-    if examination.rubrics:
+
+                                  
+    if examination.rubrics or examination.examiner_assignments:
         flash(
-            "This examination has associated rubrics "
-            "and cannot be deleted.",
+            "This examination has associated rubrics or examiner assignments and cannot be deleted.",
             "warning"
         )
+
         return redirect(url_for("exam_admin.exam_list"))
-    # Delete only if no slots or associated history exist
+
     try:
         db.session.delete(examination)
         db.session.commit()
 
-        flash(
-            "Examination deleted successfully!",
-            "success"
-        )
+        flash("Examination deleted successfully!", "success")
 
-    except Exception:
+    except Exception as e:
         db.session.rollback()
 
+        print("EXAMINATION DELETION ERROR:", repr(e))
+
         flash(
-            "Unable to delete examination. Please try again.",
+            "Unable to delete examination. Please check the terminal.",
             "danger"
         )
 

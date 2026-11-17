@@ -4,6 +4,7 @@ from extensions import db
 from models.user import User
 from models.examination import Examination
 from models.examiner_assignment import ExaminerAssignment
+from models.slot import ExaminationSlot
 from utils.decorators import role_required
 
 
@@ -22,9 +23,15 @@ def assignment_list():
         ExaminerAssignment.id.desc()
     ).all()
 
+    approved_examiners = User.query.filter_by(
+        role="examiner",
+        is_approved=True
+    ).order_by(User.full_name).all()
+
     return render_template(
         "admin/assignments.html",
-        assignments=assignments
+        assignments=assignments,
+        approved_examiners=approved_examiners
     )
 
 
@@ -95,3 +102,71 @@ def add_assignment():
         examiners=examiners,
         examinations=examinations
     )
+
+@assignment_admin_bp.route("/change-examiner/<int:assignment_id>", methods=["POST"])
+@role_required("admin")
+def change_examiner(assignment_id):
+    assignment = db.session.get(ExaminerAssignment, assignment_id)
+    if assignment is None:
+        flash("Examiner assignment not found.", "danger")
+        return redirect(url_for("assignment_admin.assignment_list"))
+
+    new_examiner_id = request.form.get("examiner_id", type=int)
+    new_examiner = User.query.filter_by(
+        id=new_examiner_id,
+        role="examiner",
+        is_approved=True
+    ).first()
+
+    if not new_examiner:
+        flash("Please select an approved examiner.", "danger")
+        return redirect(url_for("assignment_admin.assignment_list"))
+
+    if new_examiner.id == assignment.examiner_id:
+        flash("This examiner is already assigned.", "info")
+        return redirect(url_for("assignment_admin.assignment_list"))
+
+    duplicate = ExaminerAssignment.query.filter_by(
+        examiner_id=new_examiner.id,
+        examination_id=assignment.examination_id
+    ).first()
+    if duplicate:
+        flash("The selected examiner is already assigned to this examination.", "warning")
+        return redirect(url_for("assignment_admin.assignment_list"))
+
+                                                                               
+                                                                                 
+    unbooked_slots = ExaminationSlot.query.filter_by(
+        examiner_id=assignment.examiner_id,
+        examination_id=assignment.examination_id
+    ).filter(~ExaminationSlot.bookings.any()).all()
+
+    for slot in unbooked_slots:
+        overlap = ExaminationSlot.query.filter(
+            ExaminationSlot.id != slot.id,
+            ExaminationSlot.examiner_id == new_examiner.id,
+            ExaminationSlot.slot_date == slot.slot_date,
+            ExaminationSlot.start_time < slot.end_time,
+            ExaminationSlot.end_time > slot.start_time
+        ).first()
+        if overlap:
+            flash(
+                "The new examiner has an overlapping slot. Resolve the conflict before reassignment.",
+                "danger"
+            )
+            return redirect(url_for("assignment_admin.assignment_list"))
+
+    try:
+        for slot in unbooked_slots:
+            slot.examiner_id = new_examiner.id
+        assignment.examiner_id = new_examiner.id
+        db.session.commit()
+        flash(
+            "Examiner assignment changed. Existing booked slots retain their original examiner.",
+            "success"
+        )
+    except Exception:
+        db.session.rollback()
+        flash("Unable to change examiner assignment.", "danger")
+
+    return redirect(url_for("assignment_admin.assignment_list"))

@@ -25,7 +25,7 @@ student_booking_bp = Blueprint(
 )
 
 
-# View available slots for an examination
+                                         
 @student_booking_bp.route("/examination/<int:examination_id>/slots")
 @role_required("student")
 def slot_list(examination_id):
@@ -45,7 +45,7 @@ def slot_list(examination_id):
     )
 
 
-# Book an examination slot
+                          
 @student_booking_bp.route("/book/<int:slot_id>", methods=["POST"])
 @role_required("student")
 def book_slot(slot_id):
@@ -63,7 +63,7 @@ def book_slot(slot_id):
     return redirect(url_for("student_bookings.booking_list"))
 
 
-# View all bookings
+                   
 @student_booking_bp.route("/")
 @role_required("student")
 def booking_list():
@@ -80,7 +80,7 @@ def booking_list():
     )
 
 
-# Cancel a booking
+                  
 @student_booking_bp.route("/cancel/<int:booking_id>", methods=["POST"])
 @role_required("student")
 def cancel_booking(booking_id):
@@ -104,6 +104,15 @@ def cancel_booking(booking_id):
         flash("The booking cancellation deadline has passed.", "danger")
         return redirect(url_for("student_bookings.booking_list"))
 
+    if booking.slot is not None:
+        slot_start = datetime.combine(
+            booking.slot.slot_date,
+            booking.slot.start_time
+        )
+        if datetime.now() >= slot_start:
+            flash("A booking cannot be cancelled after its slot has started.", "danger")
+            return redirect(url_for("student_bookings.booking_list"))
+
     booking.status = "cancelled"
 
     slot = db.session.get(ExaminationSlot, booking.slot_id)
@@ -124,7 +133,7 @@ def cancel_booking(booking_id):
     return redirect(url_for("student_bookings.booking_list"))
 
 
-# View upcoming examination schedule
+                                    
 @student_booking_bp.route("/schedule")
 @role_required("student")
 def schedule():

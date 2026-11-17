@@ -61,7 +61,7 @@ def submit_marks(booking_id):
             url_for("examiner_evaluations.evaluation_list")
         )
 
-    # Prevent duplicate evaluation
+                                  
     existing_evaluation = Evaluation.query.filter_by(
         booking_id=booking.id
     ).first()

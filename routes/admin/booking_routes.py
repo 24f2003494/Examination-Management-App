@@ -1,5 +1,8 @@
 
+from datetime import datetime
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from sqlalchemy import or_
 from extensions import db
 from models.booking import Booking
 from models.slot import ExaminationSlot
@@ -32,7 +35,7 @@ def booking_list():
     if search:
         if search.isdigit():
             query = query.filter(
-                db.or_(
+                or_(
                     User.full_name.ilike(f"%{search}%"),
                     User.email.ilike(f"%{search}%"),
                     User.id == int(search),
@@ -41,13 +44,13 @@ def booking_list():
             )
         else:
             query = query.filter(
-                db.or_(
+                or_(
                     User.full_name.ilike(f"%{search}%"),
                     User.email.ilike(f"%{search}%")
                 )
             )
 
-    if status in ("booked", "cancelled"):
+    if status in ("booked", "cancelled", "completed"):
         query = query.filter(Booking.status == status)
 
     if examination_id:
@@ -100,6 +103,23 @@ def reschedule_booking(booking_id):
                         booking_id=booking.id)
             )
 
+        if new_slot.slot_date < datetime.now().date() or (
+            new_slot.slot_date == datetime.now().date()
+            and new_slot.start_time <= datetime.now().time()
+        ):
+            flash("A booking can only be moved to a future slot.", "danger")
+            return redirect(
+                url_for("admin_bookings.reschedule_booking",
+                        booking_id=booking.id)
+            )
+
+        if not new_slot.examiner or not new_slot.examiner.is_approved:
+            flash("The selected slot's examiner is not currently approved.", "danger")
+            return redirect(
+                url_for("admin_bookings.reschedule_booking",
+                        booking_id=booking.id)
+            )
+
         if new_slot.id != current_slot.id:
             active_bookings = Booking.query.filter_by(
                 slot_id=new_slot.id,
@@ -145,9 +165,10 @@ def reschedule_booking(booking_id):
             db.session.rollback()
             flash("Unable to reschedule this booking.", "danger")
 
-    available_slots = ExaminationSlot.query.filter_by(
-        examination_id=current_slot.examination_id,
-        status="available"
+    available_slots = ExaminationSlot.query.filter(
+        ExaminationSlot.examination_id == current_slot.examination_id,
+        ExaminationSlot.status == "available",
+        ExaminationSlot.slot_date >= datetime.now().date()
     ).order_by(
         ExaminationSlot.slot_date,
         ExaminationSlot.start_time

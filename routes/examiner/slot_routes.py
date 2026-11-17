@@ -19,7 +19,6 @@ from models.examiner_assignment import ExaminerAssignment
 from models.slot import ExaminationSlot
 from models.user import User
 from services.slot_service import create_examiner_slot
-from services.timeline_service import is_timeline_open
 from utils.decorators import role_required
 
 
@@ -30,9 +29,9 @@ slot_bp = Blueprint(
 )
 
 
-# --------------------------------------------------
-# VIEW EXAMINER SLOTS
-# --------------------------------------------------
+                                                    
+                     
+                                                    
 
 @slot_bp.route("/")
 @role_required("examiner")
@@ -51,9 +50,9 @@ def slot_list():
     )
 
 
-# --------------------------------------------------
-# CREATE EXAMINATION SLOT
-# --------------------------------------------------
+                                                    
+                         
+                                                    
 
 @slot_bp.route("/add", methods=["GET", "POST"])
 @role_required("examiner")
@@ -150,9 +149,9 @@ def add_slot():
     )
 
 
-# --------------------------------------------------
-# EDIT EXAMINATION SLOT
-# --------------------------------------------------
+                                                    
+                       
+                                                    
 
 @slot_bp.route("/edit/<int:slot_id>", methods=["GET", "POST"])
 @role_required("examiner")
@@ -167,11 +166,11 @@ def edit_slot(slot_id):
         flash("Your examiner account is not approved.", "danger")
         return redirect(url_for("examiner.dashboard"))
 
-    if has_timeline_started("student_booking"):
+    if not is_timeline_open("slot_creation") or has_timeline_started("student_booking"):
         flash(
-        "Slots cannot be modified after student booking begins.",
-        "warning"
-    )
+            "Slot editing is only available during the slot creation period.",
+            "warning"
+        )
         return redirect(url_for("examiner_slots.slot_list"))
 
     if slot.bookings:
@@ -233,6 +232,12 @@ def edit_slot(slot_id):
                 url_for("examiner_slots.edit_slot", slot_id=slot.id)
             )
 
+        if slot_date == datetime.today().date() and start_time <= datetime.now().time():
+            flash("The slot start time must be in the future.", "danger")
+            return redirect(
+                url_for("examiner_slots.edit_slot", slot_id=slot.id)
+            )
+
         overlapping_slot = ExaminationSlot.query.filter(
             ExaminationSlot.id != slot.id,
             ExaminationSlot.examiner_id == current_user.id,
@@ -267,9 +272,9 @@ def edit_slot(slot_id):
     )
 
 
-# --------------------------------------------------
-# DELETE EXAMINATION SLOT
-# --------------------------------------------------
+                                                    
+                         
+                                                    
 
 @slot_bp.route("/delete/<int:slot_id>", methods=["POST"])
 @role_required("examiner")
@@ -284,8 +289,8 @@ def delete_slot(slot_id):
         flash("Your examiner account is not approved.", "danger")
         return redirect(url_for("examiner.dashboard"))
 
-    if not is_timeline_open("slot_creation"):
-        flash("Slot deletion is currently closed.", "warning")
+    if not is_timeline_open("slot_creation") or has_timeline_started("student_booking"):
+        flash("Slot deletion is only available during the slot creation period.", "warning")
         return redirect(url_for("examiner_slots.slot_list"))
 
     if slot.bookings:

@@ -39,6 +39,13 @@ class Examination(db.Model):
         default=40
     )
 
+    status = db.Column(
+        db.String(30),
+        nullable=False,
+        default="Draft",
+        server_default="Draft"
+    )
+
     course = db.relationship(
         "Course",
         back_populates="examinations"
@@ -53,9 +60,11 @@ class Examination(db.Model):
         "ExaminationSlot",
         back_populates="examination"
     )
+
     examiner_assignments = db.relationship(
-    "ExaminerAssignment",
-    back_populates="examination"
-)
+        "ExaminerAssignment",
+        back_populates="examination"
+    )
+
     def __repr__(self):
         return f"<Examination {self.exam_name}>"

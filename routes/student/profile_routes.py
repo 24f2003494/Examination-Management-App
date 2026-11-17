@@ -1,4 +1,6 @@
 
+import re
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -28,6 +30,14 @@ def edit_profile():
             flash("Name and email are required.", "danger")
             return redirect(url_for("student_profile.edit_profile"))
 
+        if len(full_name) < 2 or len(full_name) > 100:
+            flash("Name must contain 2 to 100 characters.", "danger")
+            return redirect(url_for("student_profile.edit_profile"))
+
+        if len(email) > 254 or not re.fullmatch(r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email):
+            flash("Please enter a valid email address.", "danger")
+            return redirect(url_for("student_profile.edit_profile"))
+
         existing_user = User.query.filter(
             User.email == email,
             User.id != current_user.id
@@ -45,8 +55,12 @@ def edit_profile():
                 flash("Your current password is incorrect.", "danger")
                 return redirect(url_for("student_profile.edit_profile"))
 
-            if len(new_password) < 8:
-                flash("New password must contain at least 8 characters.", "danger")
+            if len(new_password) < 8 or len(new_password) > 128:
+                flash("New password must contain 8 to 128 characters.", "danger")
+                return redirect(url_for("student_profile.edit_profile"))
+
+            if not re.search(r"[A-Za-z]", new_password) or not re.search(r"[0-9]", new_password):
+                flash("New password must contain at least one letter and one number.", "danger")
                 return redirect(url_for("student_profile.edit_profile"))
 
         try:

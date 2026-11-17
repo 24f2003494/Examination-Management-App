@@ -1,54 +1,30 @@
-
-from flask_login import UserMixin
-from extensions import db
 from typing import Optional, TYPE_CHECKING
 
-from sqlalchemy.orm import Mapped, relationship
 from flask_login import UserMixin
+from sqlalchemy.orm import Mapped, relationship
+
 from extensions import db
 
 if TYPE_CHECKING:
     from models.examiner import ExaminerProfile
-from sqlalchemy.orm import Mapped, relationship
-from typing import Optional
-class User(UserMixin, db.Model):
 
+
+class User(UserMixin, db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
-
-    full_name = db.Column(
-        db.String(100),
-        nullable=False
-    )
-
-    email = db.Column(
-        db.String(120),
-        unique=True,
-        nullable=False
-    )
-
-    password_hash = db.Column(
-        db.String(255),
-        nullable=False
-    )
-
-    role = db.Column(
-        db.String(20),
-        nullable=False
-    )
-
-    is_approved = db.Column(
-        db.Boolean,
-        default=True,
-        nullable=False
-    )
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(20), nullable=False)
+    is_approved = db.Column(db.Boolean, default=True, nullable=False)
+    account_active = db.Column(db.Boolean, default=True, nullable=False)
 
     examiner_profile: Mapped[Optional["ExaminerProfile"]] = relationship(
-    "ExaminerProfile",
-    back_populates="user",
-    uselist=False
-)
+        "ExaminerProfile",
+        back_populates="user",
+        uselist=False
+    )
 
     examination_slots = db.relationship(
         "ExaminationSlot",
@@ -66,10 +42,11 @@ class User(UserMixin, db.Model):
         back_populates="examiner",
         foreign_keys="Evaluation.examiner_id"
     )
+
     examiner_assignments = db.relationship(
-    "ExaminerAssignment",
-    back_populates="examiner"
-)
-    
+        "ExaminerAssignment",
+        back_populates="examiner"
+    )
+
     def __repr__(self):
         return f"<User {self.email}>"

@@ -28,7 +28,7 @@ ALLOWED_TIMELINES = {
 }
 
 
-# Display all timelines
+                       
 @timeline_admin_bp.route("/")
 @role_required("admin")
 def timeline_list():
@@ -43,7 +43,7 @@ def timeline_list():
     )
 
 
-# Add a timeline
+                
 @timeline_admin_bp.route(
     "/add",
     methods=["GET", "POST"]
@@ -150,7 +150,7 @@ def add_timeline():
     )
 
 
-# Edit a timeline
+                 
 @timeline_admin_bp.route(
     "/edit/<int:timeline_id>",
     methods=["GET", "POST"]
@@ -242,7 +242,7 @@ def edit_timeline(timeline_id):
     )
 
 
-# Activate or deactivate a timeline
+                                   
 @timeline_admin_bp.route(
     "/toggle/<int:timeline_id>",
     methods=["POST"]

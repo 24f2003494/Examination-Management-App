@@ -1,4 +1,6 @@
 
+from datetime import date, datetime
+
 from extensions import db
 from models.booking import Booking
 from models.slot import ExaminationSlot
@@ -6,9 +8,18 @@ from services.timeline_service import is_timeline_open
 
 
 def get_available_slots(examination_id):
-    return ExaminationSlot.query.filter_by(
-        examination_id=examination_id,
-        status="available"
+    if not is_timeline_open("student_booking"):
+        return []
+
+    today = date.today()
+    now_time = datetime.now().time()
+    return ExaminationSlot.query.filter(
+        ExaminationSlot.examination_id == examination_id,
+        ExaminationSlot.status == "available",
+        ExaminationSlot.slot_date >= today
+    ).filter(
+        (ExaminationSlot.slot_date > today)
+        | (ExaminationSlot.start_time > now_time)
     ).order_by(
         ExaminationSlot.slot_date,
         ExaminationSlot.start_time
@@ -27,12 +38,21 @@ def book_exam_slot(student_id, slot_id):
     if slot.status != "available":
         return False, "This slot is not available."
 
-    if Booking.query.filter_by(
+    if slot.slot_date < date.today():
+        return False, "You cannot book a slot in the past."
+
+    if slot.slot_date == date.today() and slot.start_time <= datetime.now().time():
+        return False, "The selected slot has already started or passed."
+
+    previous_booking = Booking.query.filter_by(
         student_id=student_id,
-        slot_id=slot_id,
-        status="booked"
-    ).first():
-        return False, "You have already booked this slot."
+        slot_id=slot_id
+    ).order_by(Booking.booking_date.desc()).first()
+
+    if previous_booking:
+        if previous_booking.status == "booked":
+            return False, "You have already booked this slot."
+        return False, "This slot was previously cancelled. Please choose another slot."
 
     existing_booking = (
         Booking.query
@@ -62,6 +82,7 @@ def book_exam_slot(student_id, slot_id):
     booking.student_id = student_id
     booking.slot_id = slot_id
     booking.status = "booked"
+    booking.booking_date = datetime.now()
 
     try:
         db.session.add(booking)

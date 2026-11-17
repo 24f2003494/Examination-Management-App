@@ -1,4 +1,6 @@
 
+import math
+
 from extensions import db
 
 from models.booking import Booking
@@ -23,6 +25,9 @@ def submit_evaluation(
     if booking.status != "booked":
         return False, "This booking is not active."
 
+    if remarks and len(remarks) > 5000:
+        return False, "Remarks cannot exceed 5000 characters."
+
     if not booking.slot:
         return False, "The examination slot could not be found."
 
@@ -32,7 +37,8 @@ def submit_evaluation(
     examiner = User.query.filter_by(
         id=examiner_id,
         role="examiner",
-        is_approved=True
+        is_approved=True,
+        account_active=True
     ).first()
 
     if not examiner:
@@ -67,7 +73,7 @@ def submit_evaluation(
                 f"Please enter valid marks for '{rubric.rubric_name}'."
             )
 
-        if marks < 0 or marks > rubric.max_marks:
+        if not math.isfinite(marks) or marks < 0 or marks > rubric.max_marks:
             return False, (
                 f"Marks for '{rubric.rubric_name}' must be between "
                 f"0 and {rubric.max_marks}."
@@ -85,6 +91,7 @@ def submit_evaluation(
         evaluation.marks_obtained = total_marks
         evaluation.remarks = remarks
         evaluation.is_published = False
+        booking.status = "completed"
 
         db.session.add(evaluation)
         db.session.flush()
