@@ -196,6 +196,8 @@ python create_admin.py
 ```
 
 Use the credentials configured in the project to log in as Admin.
+email: admin123@gmail.com
+password:admin@123
 
 ---
 
@@ -264,8 +266,7 @@ API responses are returned in JSON format. Access to protected resources depends
 
 ## 👩‍💻 Developer
 
-**Your Name**
-
+Gazal
 BS Degree in Data Science and Applications
 
 Indian Institute of Technology Madras
@@ -282,5 +283,5 @@ IIT Madras BS Degree Programme
 
 ## 🎥 Project Demonstration
 
-Demo Video: **[Add your Google Drive video link here]**
+Demo Video: **https://drive.google.com/file/d/1xZP_pameTm8GLPq6MW4Ow8stcoTXM40V/view?usp=sharing**
 
