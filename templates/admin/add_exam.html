@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Add Examination{% endblock %}
@@ -13,6 +12,7 @@
 
             <form method="POST"
                   action="{{ url_for('exam_admin.add_exam') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="mb-3">
                     <label for="exam_name" class="form-label">
@@ -24,6 +24,7 @@
                         class="form-control"
                         id="exam_name"
                         name="exam_name"
+                        minlength="2"
                         maxlength="150"
                         placeholder="e.g. Database Management Systems"
                         required
@@ -62,8 +63,12 @@
                         id="description"
                         name="description"
                         rows="4"
+                        maxlength="2000"
                         placeholder="Enter examination details"
                     ></textarea>
+                    <div class="form-text">
+                        Maximum 2000 characters.
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -77,6 +82,7 @@
                         id="total_marks"
                         name="total_marks"
                         min="1"
+                        max="100000"
                         value="100"
                         required
                     >
@@ -93,9 +99,23 @@
                         id="passing_marks"
                         name="passing_marks"
                         min="0"
+                        max="100000"
                         value="40"
                         required
                     >
+                    <div class="form-text">
+                        Passing marks cannot exceed total marks.
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="status" class="form-label">Examination Status</label>
+                    <select id="status" name="status" class="form-select" required>
+                        {% for status_option in ["Draft", "Slot Creation", "Booking Open", "Closed", "Completed"] %}
+                        <option value="{{ status_option }}" >{{ status_option }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <button type="submit" class="btn btn-primary">

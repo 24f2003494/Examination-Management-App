@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 
 {% block title %}Examiner Dashboard{% endblock %}
@@ -7,23 +8,189 @@
 <div class="container mt-4">
 
     <h2>Examiner Dashboard</h2>
+    <p class="text-muted">Welcome to your examiner dashboard.</p>
 
-    <p>Welcome to your examiner dashboard.</p>
+    <h4 class="mt-4 mb-3">My Statistics</h4>
 
-    <a href="{{ url_for('examiner_slots.slot_list') }}"
-       class="btn btn-primary">
-        Manage My Slots
-    </a>
+    <div class="row g-3">
 
-   <a href="{{ url_for('examiner_participants.participant_list') }}"
-   class="btn btn-primary">
-    View My Students
-</a>
-<a href="{{ url_for('examiner_evaluations.evaluation_list') }}"
-   class="btn btn-primary">
-    Pending Evaluations
-</a>
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <h6>Assigned Examinations</h6>
+                    <h2>{{ stats.assigned_examinations }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>My Slots</h6>
+                    <h2>{{ stats.slots }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Participants</h6>
+                    <h2>{{ stats.participants }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Students Evaluated</h6>
+                    <h2>{{ stats.evaluated }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <h6>Pending Evaluations</h6>
+                    <h2>{{ stats.pending }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <h4 class="mt-5 mb-3">My Assigned Examinations</h4>
+    {% if assigned_examinations %}
+        <div class="list-group">
+            {% for examination in assigned_examinations %}
+                <div class="list-group-item">
+                    <strong>{{ examination.exam_name }}</strong>
+                    <span class="text-muted"> — {{ examination.course.course_name }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">No examinations have been assigned to you yet.</div>
+    {% endif %}
+
+    <h4 class="mt-5 mb-3">Evaluation Analytics</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Evaluation Progress</h5>
+                    <canvas id="evaluationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Participants Per Examination</h5>
+                    <canvas id="participantChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <h4 class="mt-5 mb-3">Examiner Activities</h4>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+
+        <a href="{{ url_for('examiner_slots.slot_list') }}"
+           class="btn btn-primary">
+            Manage My Slots
+        </a>
+
+        <a href="{{ url_for('examiner_participants.participant_list') }}"
+           class="btn btn-primary">
+            View My Students
+        </a>
+
+        <a href="{{ url_for('examiner_evaluations.evaluation_list') }}"
+           class="btn btn-primary">
+            Pending Evaluations
+        </a>
+
+        <a href="{{ url_for('examiner_profile.edit_profile') }}"
+           class="btn btn-outline-primary">
+            My Profile
+        </a>
+
+    </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div id="examinerChartData"
+     data-evaluated="{{ stats.evaluated }}"
+     data-pending="{{ stats.pending }}"
+     data-examination-labels='{{ examination_labels | tojson }}'
+     data-participant-values='{{ participant_values | tojson }}'>
+</div>
+
+<script>
+    const chartData = document.getElementById("examinerChartData");
+
+    const evaluated = Number(chartData.dataset.evaluated);
+    const pending = Number(chartData.dataset.pending);
+
+    const examinationLabels = JSON.parse(
+        chartData.dataset.examinationLabels
+    );
+
+    const participantValues = JSON.parse(
+        chartData.dataset.participantValues
+    );
+
+    // Evaluation progress
+    new Chart(document.getElementById("evaluationChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Evaluated", "Pending"],
+            datasets: [{
+                data: [evaluated, pending]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            }
+        }
+    });
+
+    // Participants per examination
+    new Chart(document.getElementById("participantChart"), {
+        type: "bar",
+        data: {
+            labels: examinationLabels,
+            datasets: [{
+                label: "Participants",
+                data: participantValues
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+</script>
 
 {% endblock %}

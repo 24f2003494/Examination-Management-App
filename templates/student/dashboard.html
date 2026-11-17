@@ -10,11 +10,11 @@
     <div class="mb-4">
         <h2>Student Dashboard</h2>
         <p class="text-muted">
-            Welcome, {{ current_user.full_name }}! Manage your examinations and bookings here.
+            Welcome, {{ current_user.full_name }}!
+            Manage your examinations and bookings here.
         </p>
     </div>
 
-    <!-- Dashboard Statistics -->
     <h4 class="mb-3">My Examination Overview</h4>
 
     <div class="row g-3">
@@ -66,7 +66,39 @@
 
     </div>
 
-    <!-- Student Activities -->
+    <h4 class="mt-5 mb-3">My Examination Analytics</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Examination History</h5>
+                    <canvas id="historyChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5>Booking Status</h5>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>My Published Examination Results</h5>
+                    <canvas id="resultChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <h4 class="mt-5 mb-3">Student Activities</h4>
 
     <div class="row g-3">
@@ -139,5 +171,91 @@
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div id="studentChartData"
+     data-history-labels='{{ history_labels | tojson }}'
+     data-history-values='{{ history_values | tojson }}'
+     data-status-labels='{{ status_labels | tojson }}'
+     data-status-values='{{ status_values | tojson }}'
+     data-result-labels='{{ result_labels | tojson }}'
+     data-result-values='{{ result_values | tojson }}'>
+</div>
+
+<script>
+    const chartData = document.getElementById("studentChartData");
+
+    const historyLabels = JSON.parse(chartData.dataset.historyLabels);
+    const historyValues = JSON.parse(chartData.dataset.historyValues);
+
+    const statusLabels = JSON.parse(chartData.dataset.statusLabels);
+    const statusValues = JSON.parse(chartData.dataset.statusValues);
+
+    const resultLabels = JSON.parse(chartData.dataset.resultLabels);
+    const resultValues = JSON.parse(chartData.dataset.resultValues);
+
+    // Examination history
+    new Chart(document.getElementById("historyChart"), {
+        type: "bar",
+        data: {
+            labels: historyLabels,
+            datasets: [{
+                label: "Bookings",
+                data: historyValues
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    // Booking status
+    new Chart(document.getElementById("statusChart"), {
+        type: "doughnut",
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusValues
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            }
+        }
+    });
+
+    // Published results
+    new Chart(document.getElementById("resultChart"), {
+        type: "bar",
+        data: {
+            labels: resultLabels,
+            datasets: [{
+                label: "Marks Obtained",
+                data: resultValues
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 
 {% endblock %}

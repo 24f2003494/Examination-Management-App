@@ -1,4 +1,3 @@
-```html
 {% extends "base.html" %}
 
 {% block title %}Assign Examination{% endblock %}
@@ -18,6 +17,7 @@
                 <div class="card-body">
 
                     <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <div class="mb-3">
                             <label for="examiner_id" class="form-label">
@@ -96,4 +96,3 @@
 
 </div>
 {% endblock %}
-```

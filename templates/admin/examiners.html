@@ -9,7 +9,6 @@
 
     <h2 class="mb-4">Examiner Management</h2>
 
-    <!-- Pending Examiners -->
     <div class="card shadow mb-4">
 
         <div class="card-header bg-warning">
@@ -43,6 +42,7 @@
                                             method="POST"
                                             action="{{ url_for('examiner_admin.approve_examiner', user_id=examiner.id) }}"
                                         >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button
                                                 type="submit"
                                                 class="btn btn-success btn-sm"
@@ -70,7 +70,6 @@
     </div>
 
 
-    <!-- Approved Examiners -->
     <div class="card shadow">
 
         <div class="card-header bg-success text-white">
@@ -90,6 +89,7 @@
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
 
@@ -103,6 +103,16 @@
                                         <span class="badge bg-success">
                                             Approved
                                         </span>
+                                    </td>
+                                    <td>
+                                        <form method="POST"
+                                              action="{{ url_for('examiner_admin.deactivate_examiner', user_id=examiner.id) }}"
+                                              onsubmit="return confirm('Deactivate this examiner?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                Deactivate
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -119,6 +129,40 @@
 
             {% endif %}
 
+        </div>
+    </div>
+
+
+    <div class="card shadow mt-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Deactivated Examiners</h5>
+        </div>
+        <div class="card-body">
+            {% if deactivated_examiners %}
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Approval</th><th>Action</th></tr></thead>
+                        <tbody>
+                        {% for examiner in deactivated_examiners %}
+                            <tr>
+                                <td>{{ examiner.id }}</td>
+                                <td>{{ examiner.full_name }}</td>
+                                <td>{{ examiner.email }}</td>
+                                <td>{{ "Approved" if examiner.is_approved else "Pending approval" }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('examiner_admin.reactivate_examiner', user_id=examiner.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-success btn-sm">Reactivate</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted mb-0">No deactivated examiners.</p>
+            {% endif %}
         </div>
     </div>
 

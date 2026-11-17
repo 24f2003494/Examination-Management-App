@@ -1,13 +1,104 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examination Management Portal</title>
-</head>
-<body>
-    <h1>Examination Management Portal</h1>
-    <p>Welcome to the EMP application!</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Examination Management Portal{% endblock %}
+
+{% block body_class %}emp-app emp-landing{% endblock %}
+
+{% block content %}
+
+<section class="home-hero">
+    <div class="container text-center">
+
+        <div class="home-icon" aria-hidden="true">📝</div>
+
+        <h1>
+            Examination Management Portal
+        </h1>
+
+        <p class="home-tagline">
+            Plan • Book • Evaluate • Achieve
+        </p>
+
+        <p class="home-description">
+            A centralized platform for administrators, examiners, and students
+            to manage examinations, schedule slots, track bookings, and publish results.
+        </p>
+
+    </div>
+</section>
+
+
+<section class="home-roles">
+    <div class="container">
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+                <article class="home-role-card h-100">
+
+                    <h2>
+                        <span aria-hidden="true">🛡️</span>
+                        Administrator
+                    </h2>
+
+                    <p>
+                        Manage courses and examinations, approve examiners,
+                        configure timelines, assign examiners, and monitor bookings.
+                    </p>
+
+                </article>
+            </div>
+
+            <div class="col-md-4">
+                <article class="home-role-card h-100">
+
+                    <h2>
+                        <span aria-hidden="true">👨‍🏫</span>
+                        Examiner
+                    </h2>
+
+                    <p>
+                        Manage examination slots, view assigned participants,
+                        evaluate students using rubrics, and submit marks.
+                    </p>
+
+                </article>
+            </div>
+
+            <div class="col-md-4">
+                <article class="home-role-card h-100">
+
+                    <h2>
+                        <span aria-hidden="true">🎓</span>
+                        Student
+                    </h2>
+
+                    <p>
+                        Browse available examinations, book and manage slots,
+                        track examination history, and view published results.
+                    </p>
+
+                </article>
+            </div>
+
+        </div>
+
+        <div class="home-actions">
+
+            <a href="{{ url_for('auth.login') }}"
+               class="btn home-login-btn">
+                Login
+            </a>
+
+            <a href="{{ url_for('auth.register') }}"
+               class="btn home-register-btn">
+                Register
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

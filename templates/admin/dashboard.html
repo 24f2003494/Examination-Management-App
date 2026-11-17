@@ -14,7 +14,6 @@
         </div>
     </div>
 
-    <!-- Dashboard Statistics -->
     <h4 class="mb-3">Portal Statistics</h4>
 
     <div class="row g-3">
@@ -75,7 +74,47 @@
 
     </div>
 
-    <!-- Search -->
+    <h4 class="mt-5 mb-3">Portal Analytics</h4>
+
+    <div class="row g-4">
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Booking Status Distribution</h5>
+                    <canvas id="bookingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Examiner Workload</h5>
+                    <canvas id="examinerChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Examination Completion Status</h5>
+                    <canvas id="completionChart" role="img" aria-label="Examination completion status chart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Bookings Per Examination</h5>
+                    <canvas id="examinationChart" role="img" aria-label="Bookings per examination chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <h4 class="mt-5 mb-3">Search Management</h4>
 
     <div class="card shadow-sm mb-4">
@@ -89,7 +128,6 @@
         </div>
     </div>
 
-    <!-- Management Sections -->
     <h4 class="mb-3">Management Options</h4>
 
     <div class="row g-3">
@@ -133,7 +171,6 @@
             </div>
         </div>
 
-        <!-- Corrected Rubric Management -->
         <div class="col-md-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
@@ -199,4 +236,107 @@
 
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div id="chartData"
+     data-booking-labels='{{ booking_labels | tojson }}'
+     data-booking-values='{{ booking_values | tojson }}'
+     data-examiner-labels='{{ examiner_labels | tojson }}'
+     data-examiner-values='{{ examiner_values | tojson }}'
+     data-examination-labels='{{ examination_labels | tojson }}'
+     data-examination-values='{{ examination_values | tojson }}'
+     data-completion-labels='{{ completion_labels | tojson }}'
+     data-completion-values='{{ completion_values | tojson }}'>
+</div>
+
+<script>
+    const chartData = document.getElementById("chartData");
+
+    const bookingLabels = JSON.parse(chartData.dataset.bookingLabels);
+    const bookingValues = JSON.parse(chartData.dataset.bookingValues);
+
+    const examinerLabels = JSON.parse(chartData.dataset.examinerLabels);
+    const examinerValues = JSON.parse(chartData.dataset.examinerValues);
+
+    const examinationLabels = JSON.parse(chartData.dataset.examinationLabels);
+    const examinationValues = JSON.parse(chartData.dataset.examinationValues);
+    const completionLabels = JSON.parse(chartData.dataset.completionLabels);
+    const completionValues = JSON.parse(chartData.dataset.completionValues);
+
+    new Chart(document.getElementById("completionChart"), {
+        type: "doughnut",
+        data: {
+            labels: completionLabels,
+            datasets: [{ label: "Examinations", data: completionValues }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "bottom" } }
+        }
+    });
+
+    new Chart(document.getElementById("bookingChart"), {
+        type: "doughnut",
+        data: {
+            labels: bookingLabels,
+            datasets: [{
+                data: bookingValues
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: "bottom"
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById("examinerChart"), {
+        type: "bar",
+        data: {
+            labels: examinerLabels,
+            datasets: [{
+                label: "Slots Created",
+                data: examinerValues
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById("examinationChart"), {
+        type: "bar",
+        data: {
+            labels: examinationLabels,
+            datasets: [{
+                label: "Number of Bookings",
+                data: examinationValues
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

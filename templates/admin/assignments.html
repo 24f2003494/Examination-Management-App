@@ -1,4 +1,3 @@
-```html
 {% extends "base.html" %}
 
 {% block title %}Examiner Assignments{% endblock %}
@@ -34,6 +33,7 @@
                             <th>Examination</th>
                             <th>Course</th>
                             <th>Assigned On</th>
+                            <th>Change Examiner</th>
                         </tr>
                     </thead>
 
@@ -46,6 +46,24 @@
                             <td>{{ assignment.examination.course.course_name }}</td>
                             <td>
                                 {{ assignment.assigned_at.strftime('%d-%m-%Y') }}
+                            </td>
+                            <td>
+                                <form method="POST"
+                                      action="{{ url_for('assignment_admin.change_examiner', assignment_id=assignment.id) }}"
+                                      class="d-flex gap-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <select name="examiner_id" class="form-select form-select-sm" required>
+                                        {% for examiner in approved_examiners %}
+                                        <option value="{{ examiner.id }}"
+                                            {% if examiner.id == assignment.examiner_id %}selected{% endif %}>
+                                            {{ examiner.full_name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        Update
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -70,4 +88,3 @@
 
 </div>
 {% endblock %}
-```

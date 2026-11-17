@@ -1,4 +1,3 @@
-```html
 {% extends "base.html" %}
 
 {% block title %}Create Examination Slot{% endblock %}
@@ -20,6 +19,7 @@
                     {% if examinations %}
 
                     <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <div class="mb-3">
                             <label for="examination_id" class="form-label">
@@ -127,4 +127,3 @@
 
 </div>
 {% endblock %}
-```

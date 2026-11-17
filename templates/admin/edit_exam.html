@@ -16,6 +16,7 @@
                       'exam_admin.edit_exam',
                       exam_id=examination.id
                   ) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="mb-3">
                     <label for="exam_name" class="form-label">
@@ -101,6 +102,16 @@
                         value="{{ examination.passing_marks }}"
                         required
                     >
+                </div>
+
+
+                <div class="mb-3">
+                    <label for="status" class="form-label">Examination Status</label>
+                    <select id="status" name="status" class="form-select" required>
+                        {% for status_option in ["Draft", "Slot Creation", "Booking Open", "Closed", "Completed"] %}
+                        <option value="{{ status_option }}" {% if examination.status == status_option %}selected{% endif %}>{{ status_option }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
 
                 <button type="submit" class="btn btn-primary">

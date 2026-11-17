@@ -1,0 +1,117 @@
+
+{% extends "base.html" %}
+
+{% block title %}Edit Examination Slot{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header bg-dark text-white">
+                    <h4 class="mb-0">Edit Examination Slot</h4>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">Examination</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ slot.examination.exam_name }}"
+                            readonly
+                        >
+                    </div>
+
+                    <form method="POST"
+                          action="{{ url_for('examiner_slots.edit_slot', slot_id=slot.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label for="slot_date" class="form-label">
+                                Slot Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="slot_date"
+                                name="slot_date"
+                                class="form-control"
+                                value="{{ slot.slot_date.strftime('%Y-%m-%d') }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="start_time" class="form-label">
+                                Start Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="start_time"
+                                name="start_time"
+                                class="form-control"
+                                value="{{ slot.start_time.strftime('%H:%M') }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="end_time" class="form-label">
+                                End Time
+                            </label>
+
+                            <input
+                                type="time"
+                                id="end_time"
+                                name="end_time"
+                                class="form-control"
+                                value="{{ slot.end_time.strftime('%H:%M') }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="capacity" class="form-label">
+                                Maximum Student Capacity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="capacity"
+                                name="capacity"
+                                class="form-control"
+                                min="1"
+                                value="{{ slot.capacity }}"
+                                required
+                            >
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Update Slot
+                        </button>
+
+                        <a
+                            href="{{ url_for('examiner_slots.slot_list') }}"
+                            class="btn btn-secondary"
+                        >
+                            Cancel
+                        </a>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

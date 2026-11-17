@@ -15,6 +15,7 @@
                       'course_admin.edit_course',
                       course_id=course.id
                   ) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="mb-3">
                     <label for="course_name" class="form-label">

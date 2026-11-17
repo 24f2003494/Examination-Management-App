@@ -24,6 +24,7 @@
                     </p>
 
                     <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <div class="mb-3">
                             <label class="form-label">
@@ -32,10 +33,10 @@
 
                             <input
                                 type="text"
-                                name="criterion"
+                                name="rubric_name"
                                 class="form-control"
                                 maxlength="150"
-                                value="{{ rubric.criterion }}"
+                                value="{{ rubric.rubric_name }}"
                                 required
                             >
                         </div>

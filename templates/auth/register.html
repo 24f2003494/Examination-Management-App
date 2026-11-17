@@ -1,76 +1,118 @@
+
 {% extends "base.html" %}
 
 {% block title %}Register{% endblock %}
 
 {% block content %}
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
 
-            <h2 class="text-center mb-4">Create an Account</h2>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
 
-            <form method="POST" action="{{ url_for('auth.register') }}">
+                    <h2 class="text-center mb-4">Create an Account</h2>
 
-                <div class="mb-3">
-                    <label for="full_name" class="form-label">Full Name</label>
-                    <input
-                        type="text"
-                        class="form-control"
-                        id="full_name"
-                        name="full_name"
-                        required
-                    >
+                    <form method="POST"
+                          action="{{ url_for('auth.register') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label for="full_name" class="form-label">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="full_name"
+                                name="full_name"
+                                minlength="2"
+                                maxlength="100"
+                                pattern="[A-Za-z][A-Za-z .'-]*"
+                                title="Enter a valid name using letters, spaces, apostrophes, dots or hyphens."
+                                autocomplete="name"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="email"
+                                name="email"
+                                maxlength="254"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password"
+                                name="password"
+                                minlength="8"
+                                maxlength="128"
+                                pattern="(?=.*[A-Za-z])(?=.*[0-9]).{8,128}"
+                                title="Password must contain at least 8 characters, including a letter and a number."
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <small class="text-muted">
+                                At least 8 characters, including one letter
+                                and one number.
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role" class="form-label">
+                                Register As
+                            </label>
+
+                            <select
+                                class="form-select"
+                                id="role"
+                                name="role"
+                                required
+                            >
+                                <option value="">Select your role</option>
+                                <option value="student">Student</option>
+                                <option value="examiner">Examiner</option>
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+                            Register
+                        </button>
+
+                    </form>
+
+                    <p class="text-center mt-3 mb-0">
+                        Already have an account?
+                        <a href="{{ url_for('auth.login') }}">
+                            Login here
+                        </a>
+                    </p>
+
                 </div>
-
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input
-                        type="email"
-                        class="form-control"
-                        id="email"
-                        name="email"
-                        required
-                    >
-                </div>
-
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                        type="password"
-                        class="form-control"
-                        id="password"
-                        name="password"
-                        minlength="8"
-                        required
-                    >
-                </div>
-
-                <div class="mb-3">
-                    <label for="role" class="form-label">Register As</label>
-                    <select
-                        class="form-select"
-                        id="role"
-                        name="role"
-                        required
-                    >
-                        <option value="">Select your role</option>
-                        <option value="student">Student</option>
-                        <option value="examiner">Examiner</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100">
-                    Register
-                </button>
-
-            </form>
-
-            <p class="text-center mt-3">
-                Already have an account?
-                <a href="{{ url_for('auth.login') }}">Login here</a>
-            </p>
+            </div>
 
         </div>
     </div>
 </div>
+
 {% endblock %}

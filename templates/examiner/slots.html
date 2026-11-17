@@ -107,6 +107,7 @@
                                               slot_id=slot.id
                                           ) }}"
                                           class="d-inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                         <button type="submit"
                                                 class="btn btn-sm btn-danger mb-1">

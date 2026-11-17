@@ -52,6 +52,7 @@
                     {% if rubrics %}
 
                     <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <h5 class="mb-3">Evaluation Rubrics</h5>
 

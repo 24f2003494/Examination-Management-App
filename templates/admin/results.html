@@ -94,6 +94,7 @@
                                           'admin_results.publish_result',
                                           evaluation_id=evaluation.id
                                       ) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                     <button type="submit"
                                             class="btn btn-success btn-sm">

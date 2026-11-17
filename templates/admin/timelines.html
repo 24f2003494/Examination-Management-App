@@ -83,6 +83,7 @@
                                     action="{{ url_for('timeline_admin.toggle_timeline', timeline_id=timeline.id) }}"
                                     class="d-inline"
                                 >
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button
                                         type="submit"
                                         class="btn btn-sm btn-info mb-1"
