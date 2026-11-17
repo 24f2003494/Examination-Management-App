@@ -1,0 +1,612 @@
+info:
+  title: Examination Management Portal API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:5000
+
+tags:
+  - name: Examinations
+  - name: Examiners
+  - name: Students
+  - name: Slots
+  - name: Bookings
+
+security:
+  - sessionCookie: []
+
+paths:
+  /api/examinations/:
+    get:
+      tags: [Examinations]
+      summary: List examinations
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Examination'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Examinations]
+      summary: Create an examination
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExaminationInput'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Examination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /api/examinations/{exam_id}:
+    parameters:
+      - $ref: '#/components/parameters/ExamId'
+    get:
+      tags: [Examinations]
+      summary: Get an examination
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Examination'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Examinations]
+      summary: Update an examination
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExaminationUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Examination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Examinations]
+      summary: Delete an examination
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/examiners/:
+    get:
+      tags: [Examiners]
+      summary: List examiners
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Examiner'
+    post:
+      tags: [Examiners]
+      summary: Create an examiner account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Examiner'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/examiners/{user_id}:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [Examiners]
+      summary: Get an examiner
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Examiner'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Examiners]
+      summary: Update an examiner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExaminerUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Examiner'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Examiners]
+      summary: Deactivate an examiner
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/students/:
+    get:
+      tags: [Students]
+      summary: List students
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+    post:
+      tags: [Students]
+      summary: Create a student account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/students/{user_id}:
+    parameters:
+      - $ref: '#/components/parameters/UserId'
+    get:
+      tags: [Students]
+      summary: Get a student
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Students]
+      summary: Update a student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Students]
+      summary: Deactivate a student
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/slots/:
+    get:
+      tags: [Slots]
+      summary: List examination slots
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+    post:
+      tags: [Slots]
+      summary: Create an examination slot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlotInput'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slot'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/slots/{slot_id}:
+    parameters:
+      - $ref: '#/components/parameters/SlotId'
+    get:
+      tags: [Slots]
+      summary: Get an examination slot
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slot'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Slots]
+      summary: Update an examination slot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlotUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slot'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags: [Slots]
+      summary: Delete an examination slot
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/bookings/:
+    get:
+      tags: [Bookings]
+      summary: List bookings
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Booking'
+    post:
+      tags: [Bookings]
+      summary: Create a booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slot_id]
+              properties:
+                slot_id:
+                  type: integer
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /api/bookings/{booking_id}:
+    parameters:
+      - $ref: '#/components/parameters/BookingId'
+    get:
+      tags: [Bookings]
+      summary: Get a booking
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Bookings]
+      summary: Reschedule a booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slot_id]
+              properties:
+                slot_id:
+                  type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    delete:
+      tags: [Bookings]
+      summary: Cancel a booking
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+
+  parameters:
+    ExamId:
+      name: exam_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    SlotId:
+      name: slot_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    BookingId:
+      name: booking_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    Examination:
+      type: object
+      properties:
+        id: {type: integer}
+        exam_name: {type: string}
+        course_id: {type: integer}
+        course_name: {type: string}
+        total_marks: {type: integer}
+        passing_marks: {type: integer}
+        status:
+          type: string
+          enum: [Draft, Slot Creation, Booking Open, Closed, Completed]
+    ExaminationInput:
+      type: object
+      required: [exam_name, course_id, total_marks, passing_marks]
+      properties:
+        exam_name: {type: string, minLength: 2, maxLength: 150}
+        course_id: {type: integer}
+        total_marks: {type: integer, minimum: 1}
+        passing_marks: {type: integer, minimum: 0}
+        status:
+          type: string
+          enum: [Draft, Slot Creation, Booking Open, Closed, Completed]
+          default: Draft
+    ExaminationUpdate:
+      allOf:
+        - $ref: '#/components/schemas/ExaminationInput'
+    UserCreate:
+      type: object
+      required: [full_name, email, password]
+      properties:
+        full_name: {type: string, minLength: 2, maxLength: 100}
+        email: {type: string, format: email}
+        password: {type: string, minLength: 8, maxLength: 128}
+    Examiner:
+      type: object
+      properties:
+        id: {type: integer}
+        full_name: {type: string}
+        email: {type: string, format: email}
+        role: {type: string, example: examiner}
+        is_approved: {type: boolean}
+        is_active: {type: boolean}
+    ExaminerUpdate:
+      type: object
+      properties:
+        full_name: {type: string}
+        email: {type: string, format: email}
+        is_approved: {type: boolean}
+        is_active: {type: boolean}
+    Student:
+      type: object
+      properties:
+        id: {type: integer}
+        full_name: {type: string}
+        email: {type: string, format: email}
+        role: {type: string, example: student}
+        is_active: {type: boolean}
+    StudentUpdate:
+      type: object
+      properties:
+        full_name: {type: string}
+        email: {type: string, format: email}
+        is_active: {type: boolean}
+    Slot:
+      type: object
+      properties:
+        id: {type: integer}
+        examination_id: {type: integer}
+        examination_name: {type: string}
+        examiner_id: {type: integer}
+        examiner_name: {type: string}
+        slot_date: {type: string, format: date}
+        start_time: {type: string, example: '09:00'}
+        end_time: {type: string, example: '09:30'}
+        capacity: {type: integer}
+        status: {type: string}
+    SlotInput:
+      type: object
+      required: [examination_id, examiner_id, slot_date, start_time, end_time, capacity]
+      properties:
+        examination_id: {type: integer}
+        examiner_id: {type: integer}
+        slot_date: {type: string, format: date}
+        start_time: {type: string, example: '09:00'}
+        end_time: {type: string, example: '09:30'}
+        capacity: {type: integer, minimum: 1}
+    SlotUpdate:
+      type: object
+      properties:
+        examination_id: {type: integer}
+        examiner_id: {type: integer}
+        slot_date: {type: string, format: date}
+        start_time: {type: string, example: '09:00'}
+        end_time: {type: string, example: '09:30'}
+        capacity: {type: integer, minimum: 1}
+    Booking:
+      type: object
+      properties:
+        id: {type: integer}
+        student_id: {type: integer}
+        slot_id: {type: integer}
+        booking_date: {type: string, format: date-time}
+        status: {type: string}
+    Message:
+      type: object
+      properties:
+        message: {type: string}
+    Error:
+      type: object
+      properties:
+        error: {type: string}
+
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
